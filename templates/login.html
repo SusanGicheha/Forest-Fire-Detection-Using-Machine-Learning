@@ -1,0 +1,42 @@
+{% extends "bootstrap/base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+Login
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link href="/static/css/signin.css" rel="stylesheet">
+{% endblock %}
+
+
+
+{% block content %}
+<nav class="navbar">
+
+  <ul>
+    <li>Fire Monitoring Station</li>
+    <li><a href="{{url_for('home')}}">Home</a></li>
+    <li><a href="contact.asp">Contact</a></li>
+    <li><a href="about.asp">About</a></li>
+  </ul>
+
+</nav>
+<div class="container ">
+  <main class="form-signin">
+  <form class="form-signin" method="post" action="/login">
+  <h2 class="form-signin-heading">Login</h2>
+    {{form.hidden_tag()}}
+   
+    {{wtf.form_field(form.username)}}
+   
+    
+    {{wtf.form_field(form.password)}}
+    
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+  </form>
+  </main>
+  
+</div>
+{% endblock %}
