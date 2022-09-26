@@ -1,0 +1,34 @@
+{% extends 'template.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+Inputs
+{% endblock %}
+{% block styles %}
+{{super()}}
+<link href="/static/css/signin.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container ">
+  <main class="form-signin">
+  <form class="form-signin" method="post" action="/inputs">
+    <h2 class="form-signin-heading">Fill in with the appropriate data</h2>
+    <br/>
+   
+      {{form.hidden_tag()}}
+
+      {{wtf.form_field(form.month)}}
+      {{wtf.form_field(form.temp)}}
+      {{wtf.form_field(form.rh)}}
+      {{wtf.form_field(form.wind)}}
+      {{wtf.form_field(form.ffmc)}}
+      {{wtf.form_field(form.dmc)}}
+      {{wtf.form_field(form.isi)}}
+      <br/>
+      <button class="btn btn-success" type="submit">Submit</button>
+    
+    </form>
+  </main>
+  
+</div>
+{% endblock %}

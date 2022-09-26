@@ -8,7 +8,7 @@ from flask_login import UserMixin,login_user,LoginManager,login_required,logout_
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,IntegerField,FloatField
-from wtforms.validators import InputRequired,Email,Length,ValidationError
+from wtforms.validators import InputRequired,Email,Length,ValidationError,DataRequired,NumberRange
 from flask_bootstrap import Bootstrap
 from joblib import load
 import numpy as np
@@ -36,6 +36,22 @@ class User(db.Model,UserMixin):
     email=db.Column(db.String[80],nullable=False,unique=True)
     username = db.Column(db.String[50], nullable=False)
     password = db.Column(db.String[80], nullable=False)
+class features(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    month = db.Column(db.Integer,nullable=False)
+    temp = db.Column(db.Float[20],nullable=False)
+    rh = db.Column(db.Float[20],nullable=False)
+    wind = db.Column(db.Float[20],nullable=False)
+    ffmc = db.Column(db.Float[20],nullable=False)
+    dmc = db.Column(db.Float[20],nullable=False)
+    isi = db.Column(db.Float[20],nullable=False)
+
+class results(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    feature_id = db.Column(db.Integer, db.ForeignKey("features.id"), nullable=False)
+    status = db.Column(db.Integer, nullable=False)
+
 
 class RegisterForm(FlaskForm):
     email = StringField(validators=[InputRequired(),Length(min=4,max=90),Email(message='Invalid email')],render_kw={"placeholder":"Email"})
@@ -52,20 +68,19 @@ class RegisterForm(FlaskForm):
             raise ValidationError("That email already exists. Please choose a different one.")
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(),Length(min=4,max=20)],render_kw={"placeholder":"Username"})
-    password = PasswordField(validators=[InputRequired(),Length(min=4, max=20)], render_kw={"placeholder":"Password"})
+    username = StringField(validators=[InputRequired(),Length(min=4,max=20),DataRequired()],render_kw={"placeholder":"Username"})
+    password = PasswordField(validators=[InputRequired(),Length(min=4, max=20),DataRequired()], render_kw={"placeholder":"Password"})
 
     #submit = SubmitField("Login")
 
 class PredictionForm(FlaskForm):
-    month = IntegerField(validators=[InputRequired()],render_kw={'placeholder':'Month in Number ie: 1 (January)'})
-    temperature = FloatField(validators=[InputRequired()],render_kw={'placeholder':'Temperature'})
-    RH = FloatField(validators=[InputRequired()],render_kw={'placeholder':'Relative Humidity'})
-    wind = FloatField(validators=[InputRequired()],render_kw={'placeholder':'Wind Speed'})
-    FFMC = FloatField(validators=[InputRequired()],render_kw={'placeholder':'FFMC'})
-    DMC = FloatField(validators=[InputRequired()],render_kw={'placeholder':'DMC'})
-    DC = FloatField(validators=[InputRequired()],render_kw={'placeholder':'DC'})
-    ISI = FloatField(validators=[InputRequired()],render_kw={'placeholder':'ISI'})
+    month = IntegerField(validators=[NumberRange(min=1,max=12) ,InputRequired(),DataRequired()],render_kw={'placeholder':'Month in Number ie: 1 (January)'})
+    temp = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Temperature'})
+    rh = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Relative Humidity'})
+    wind = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Wind Speed'})
+    ffmc = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'FFMC'})
+    dmc = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'DMC'})
+    isi = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'ISI'})
     
 @app.route("/")
 def home():
@@ -76,16 +91,18 @@ def home():
 def warning():
     return render_template('warning.html')
 
-@app.route("/alert")
-def alert():
+@app.route("/inputs", methods=['GET','POST'])
+@login_required
+def inputs():
+    #inputs=None
     form = PredictionForm()
     if form.validate_on_submit():
-        features = [float(x) for x in request.form.values()]
-        final_features = [np.array(features)]
-        prediction = model.predict(final_features)
-
-        return render_template('warning.html',prediction_text='{}'.format(prediction)) 
-    return render_template('alert.html')
+        #hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_entry = features(month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data)
+        db.session.add(new_entry)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+    return render_template('inputs.html', form=form)
 
 @app.route("/predict",methods=['POST'])
 def predict():
