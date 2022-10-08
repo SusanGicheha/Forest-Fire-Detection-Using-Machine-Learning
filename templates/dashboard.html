@@ -2,7 +2,10 @@
 
 {% block content %}
 
-    <h2>Hello name, </h2>
-   
+    
+   <h2>Hello {{name}},</h2>
+   {% if current_user.is_authenticated %}
+  <p>prediction {{prediction_text}}</p>
+{% endif %}
 
 {% endblock %}

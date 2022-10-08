@@ -16,6 +16,14 @@ Login
 
 <div class="container ">
   <main class="form-signin">
+    {% for message in get_flashed_messages() %}
+      <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <div>
+        {{message}}
+        
+        </div>
+      </div>
+    {% endfor %}
   <form class="form-signin" method="post" action="/login">
   <h2 class="form-signin-heading">Login</h2>
     {{form.hidden_tag()}}

@@ -1,13 +1,15 @@
 #imports
 
 
-from flask import Flask
+from email.policy import default
+from flask import Flask,g,session,flash
+
 from flask import render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin,login_user,LoginManager,login_required,logout_user,current_user
+from flask_login import current_user,UserMixin,login_user,LoginManager,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,IntegerField,FloatField
+from wtforms import HiddenField,StringField,PasswordField,IntegerField,FloatField
 from wtforms.validators import InputRequired,Email,Length,ValidationError,DataRequired,NumberRange
 from flask_bootstrap import Bootstrap
 from joblib import load
@@ -36,8 +38,10 @@ class User(db.Model,UserMixin):
     email=db.Column(db.String[80],nullable=False,unique=True)
     username = db.Column(db.String[50], nullable=False)
     password = db.Column(db.String[80], nullable=False)
+
 class features(db.Model):
     id = db.Column(db.Integer,primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     month = db.Column(db.Integer,nullable=False)
     temp = db.Column(db.Float[20],nullable=False)
     rh = db.Column(db.Float[20],nullable=False)
@@ -45,11 +49,6 @@ class features(db.Model):
     ffmc = db.Column(db.Float[20],nullable=False)
     dmc = db.Column(db.Float[20],nullable=False)
     isi = db.Column(db.Float[20],nullable=False)
-
-class results(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, nullable=False)
-    feature_id = db.Column(db.Integer, db.ForeignKey("features.id"), nullable=False)
     status = db.Column(db.Integer, nullable=False)
 
 
@@ -58,9 +57,7 @@ class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(),Length(min=4,max=20)],render_kw={"placeholder":"Username"})
     password = PasswordField(validators=[InputRequired(),Length(min=4, max=20)], render_kw={"placeholder":"Password"})
 
-    #submit = SubmitField("Register")
-
-    
+     
     def validate_email(self,email):
         existing_user_email = User.query.filter_by(
             email=email.data).first()
@@ -71,9 +68,10 @@ class LoginForm(FlaskForm):
     username = StringField(validators=[InputRequired(),Length(min=4,max=20),DataRequired()],render_kw={"placeholder":"Username"})
     password = PasswordField(validators=[InputRequired(),Length(min=4, max=20),DataRequired()], render_kw={"placeholder":"Password"})
 
-    #submit = SubmitField("Login")
+   
 
 class PredictionForm(FlaskForm):
+    user = HiddenField(validators=[DataRequired()])
     month = IntegerField(validators=[NumberRange(min=1,max=12) ,InputRequired(),DataRequired()],render_kw={'placeholder':'Month in Number ie: 1 (January)'})
     temp = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Temperature'})
     rh = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Relative Humidity'})
@@ -87,9 +85,7 @@ def home():
     #return render_template('home.html')
     return redirect(url_for('login'))
 
-@app.route("/warning")
-def warning():
-    return render_template('warning.html')
+
 
 @app.route("/inputs", methods=['GET','POST'])
 @login_required
@@ -97,38 +93,59 @@ def inputs():
     #inputs=None
     form = PredictionForm()
     if form.validate_on_submit():
-        #hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_entry = features(month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data)
-        db.session.add(new_entry)
-        db.session.commit()
         return redirect(url_for('dashboard'))
+    # if form.validate_on_submit():
+    #     # new_entry = [form.month.data,form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.isi.data]
+    #     # predict = [np.array(new_entry)]
+    #     # prediction = model.predict(predict)
+    #     return redirect(url_for('dashboard'))
     return render_template('inputs.html', form=form)
+
+
 
 @app.route("/predict",methods=['POST'])
 def predict():
-    features = [float(x) for x in request.form.values()]
-    final_features = [np.array(features)]
+    form = PredictionForm()
+    data_features = [form.month.data,form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.isi.data]
+    final_features = [np.array(data_features)]
     prediction = model.predict(final_features)
+    #store in db
+    new_entry = features(user_id=form.user.data,month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data,status='{}'.format(prediction))
+    db.session.add(new_entry)
+    db.session.commit()
+    return render_template('dashboard.html',name=session.get("username","Unknown"),prediction_text='{}'.format(prediction))
 
-    return render_template('warning.html',prediction_text='{}'.format(prediction))
+
+
 
 @app.route("/login", methods=['GET','POST'])
 def login():
     form = LoginForm()
+    
     if form.validate_on_submit():
+    
         user = User.query.filter_by(username=form.username.data).first()
+        username = form.username.data
         if user:
             if bcrypt.check_password_hash(user.password,form.password.data):
                 login_user(user)
+                session['username'] = username
+                
                 return redirect(url_for('dashboard'))
+            else:
+                flash("Wrong Password - Try Again!")
+        else:
+            flash("Incorrect Username - Try Again")
         
     return render_template('login.html',form=form)
+
+
 
 @app.route("/dashboard", methods=['GET','POST'])
 @login_required
 def dashboard():
-
-    return render_template('dashboard.html')
+    
+    return render_template('dashboard.html', name=session.get("username","Unknown"))
 
 
 

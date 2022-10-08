@@ -11,12 +11,13 @@ Inputs
 {% block content %}
 <div class="container ">
   <main class="form-signin">
-  <form class="form-signin" method="post" action="/inputs">
+  <form class="form-signin" method="post" action="/predict">
     <h2 class="form-signin-heading">Fill in with the appropriate data</h2>
     <br/>
    
       {{form.hidden_tag()}}
-
+      
+      {{form.user(value=current_user.id)}}
       {{wtf.form_field(form.month)}}
       {{wtf.form_field(form.temp)}}
       {{wtf.form_field(form.rh)}}
