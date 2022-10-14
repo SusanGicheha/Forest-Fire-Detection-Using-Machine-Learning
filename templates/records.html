@@ -1,0 +1,47 @@
+{% extends 'template.html' %}
+
+{% block content %}
+
+    
+   <h2>Historical Records</h2>
+   </br>
+   {% if current_user.is_authenticated %}
+   <div class="table-responsive">
+   <table class="table table-sm ">
+    <thead class="table-light"> 
+       <tr>
+        <th scope="col">#</th>
+        <th scope="col">user id</th>
+        <th scope="col">month</th>
+        <th scope="col">temperature</th>
+        <th scope="col">relative humidity</th>
+        <th scope="col">wind</th>
+        <th scope="col">ffmc</th>
+        <th scope="col">dmc</th>
+        <th scope="col">isi</th>
+        <th scope="col">status</th>
+        </tr>
+        </thead>
+        {% for records in read_records %}
+        <tbody >
+       <tr>
+            <th scope="row">{{records.id}}</th> 
+            <td>{{records.user_id}}</td> 
+            <td>{{records.month}}</td> 
+            <td>{{records.temp}}</td>
+            <td>{{records.rh}}</td>
+            <td>{{records.wind}}</td>
+            <td>{{records.ffmc}}</td>
+            <td>{{records.dmc}}</td>
+            <td>{{records.isi}}</td>
+            <td>{{records.status}}</td>
+            </tr>
+       
+        </tbody>
+        {%endfor%}
+    </table>
+   </div>
+    
+{% endif %}
+
+{% endblock %}

@@ -1,6 +1,7 @@
 #imports
 
 
+
 from email.policy import default
 from flask import Flask,g,session,flash
 
@@ -9,11 +10,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user,UserMixin,login_user,LoginManager,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
-from wtforms import HiddenField,StringField,PasswordField,IntegerField,FloatField
+from wtforms import EmailField,HiddenField,StringField,PasswordField,IntegerField,FloatField
 from wtforms.validators import InputRequired,Email,Length,ValidationError,DataRequired,NumberRange
 from flask_bootstrap import Bootstrap
 from joblib import load
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -53,7 +56,7 @@ class features(db.Model):
 
 
 class RegisterForm(FlaskForm):
-    email = StringField(validators=[InputRequired(),Length(min=4,max=90),Email(message='Invalid email')],render_kw={"placeholder":"Email"})
+    email = EmailField(validators=[InputRequired(),Length(min=4,max=90)],render_kw={"placeholder":"Email"})
     username = StringField(validators=[InputRequired(),Length(min=4,max=20)],render_kw={"placeholder":"Username"})
     password = PasswordField(validators=[InputRequired(),Length(min=4, max=20)], render_kw={"placeholder":"Password"})
 
@@ -115,7 +118,10 @@ def predict():
     db.session.commit()
     return render_template('dashboard.html',name=session.get("username","Unknown"),prediction_text='{}'.format(prediction))
 
-
+@app.route("/records", methods=['GET','POST'])
+def records():
+    read_records=features.query.order_by(features.id)
+    return render_template('records.html',name=session.get("username","Unknown"),read_records=read_records)
 
 
 @app.route("/login", methods=['GET','POST'])
@@ -150,6 +156,7 @@ def dashboard():
 
 
 @app.route("/register", methods=['GET','POST'])
+#@login_required
 def register():
     form =  RegisterForm()
     if form.validate_on_submit():
@@ -157,9 +164,10 @@ def register():
         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('login'))
-
-    return render_template('register.html',form=form)
+        flash("User Added Successfully! ")
+        
+    read_users=User.query.order_by(User.id)
+    return render_template('register.html',form=form,read_users=read_users)
 
 @app.route("/logout", methods=['GET','POST'])
 @login_required

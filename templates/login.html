@@ -1,21 +1,21 @@
-{% extends "bootstrap/base.html" %}
-
+{% extends 'template.html' %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block title %}
-Login
+Inputs
 {% endblock %}
-
 {% block styles %}
 {{super()}}
 <link href="/static/css/signin.css" rel="stylesheet">
 {% endblock %}
 
 
-
 {% block content %}
 
-<div class="container ">
-  <main class="form-signin">
+<div class="p-5 d-flex justify-content-center">
+ 
+  
+  <main class="p-3 w-75 border">
+  <div>
     {% for message in get_flashed_messages() %}
       <div class="alert alert-danger d-flex align-items-center" role="alert">
         <div>
@@ -24,16 +24,19 @@ Login
         </div>
       </div>
     {% endfor %}
-  <form class="form-signin" method="post" action="/login">
-  <h2 class="form-signin-heading">Login</h2>
+  <form class="justify-content-md-center" method="post" action="/login">
+  <h3 class="form-signin-heading">Login</h3>
     {{form.hidden_tag()}}
-   
+    <div class="mb-3">
     {{wtf.form_field(form.username)}}
-   
+    </div>
+    <div class="mb-3">
     
     {{wtf.form_field(form.password)}}
-    
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+    </div>
+  <div class="d-grid gap-2 col-3 justify-content-md-right">
+    <button class="btn btn-outline-success " type="submit">Login</button>
+  </div>
   </form>
   </main>
   
