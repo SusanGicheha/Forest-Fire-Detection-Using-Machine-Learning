@@ -2,7 +2,9 @@
 
 
 
-from email.policy import default
+
+
+from enum import unique
 from flask import Flask,g,session,flash
 
 from flask import render_template, redirect, url_for, request
@@ -14,14 +16,17 @@ from wtforms import EmailField,HiddenField,StringField,PasswordField,IntegerFiel
 from wtforms.validators import InputRequired,Email,Length,ValidationError,DataRequired,NumberRange
 from flask_bootstrap import Bootstrap
 from joblib import load
-import numpy as np
 import warnings
+import datetime
+import sqlite3
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app) 
 Bootstrap(app)
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
 model = load('random_forest.joblib')
 
 
@@ -43,8 +48,9 @@ class User(db.Model,UserMixin):
     password = db.Column(db.String[80], nullable=False)
 
 class features(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer,primary_key=True,unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    date=db.Column(db.Date, default=datetime.datetime.utcnow)
     month = db.Column(db.Integer,nullable=False)
     temp = db.Column(db.Float[20],nullable=False)
     rh = db.Column(db.Float[20],nullable=False)
@@ -108,15 +114,25 @@ def inputs():
 
 @app.route("/predict",methods=['POST'])
 def predict():
+    x = datetime.datetime.now()
+    y = x.strftime("%A %b %d, %Y, %I:%M:%S %p")
     form = PredictionForm()
     data_features = [form.month.data,form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.isi.data]
-    final_features = [np.array(data_features)]
+    final_features = [data_features]
     prediction = model.predict(final_features)
-    #store in db
-    new_entry = features(user_id=form.user.data,month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data,status='{}'.format(prediction))
-    db.session.add(new_entry)
-    db.session.commit()
-    return render_template('dashboard.html',name=session.get("username","Unknown"),prediction_text='{}'.format(prediction))
+    if prediction == 1: 
+        #store in db
+        new_entry = features(user_id=current_user.id,month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data,status=1)
+        db.session.add(new_entry)
+        db.session.commit()
+        
+        return render_template('dashboard.html',date=y,name=session.get("username","Unknown"),prediction_text=1)
+    else: 
+        new_entry = features(user_id=form.user.data,month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data,status=0)
+        db.session.add(new_entry)
+        db.session.commit()
+        
+        return render_template('dashboard.html',date=y,name=session.get("username","Unknown"),prediction_text=0)
 
 @app.route("/records", methods=['GET','POST'])
 def records():
@@ -150,8 +166,13 @@ def login():
 @app.route("/dashboard", methods=['GET','POST'])
 @login_required
 def dashboard():
-    
-    return render_template('dashboard.html', name=session.get("username","Unknown"))
+    x = datetime.datetime.now()
+    y = x.strftime("%A %b %d, %Y, %I:%M %p")
+    #r_status = features.query.order_by(features.status.desc()).first()
+    r_status = features.query.value(features.status.desc())
+    #read_status = cursor.execute('SELECT * FROM features ORDER BY status DESC LIMIT 1;')
+    #r_status = read_status.fetchone()
+    return render_template('dashboard.html', name=session.get("username","Unknown"), date=y,status=r_status)
 
 
 
