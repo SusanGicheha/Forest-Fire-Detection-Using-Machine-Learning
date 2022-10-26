@@ -6,12 +6,12 @@
    <h3>Hello {{name}},</h3>
    {% if current_user.is_authenticated %}
    <!-- {{status}} -->
-   {%if status == 1%}
+   {%if prediction_text == 1 %}
   <h4 style="color: red;">{{date}} &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;  
      Harzard Level: High </h4>
     <hr style="color: green;">
      <div class="alert alert-danger" role="alert">
-      <h4 class="alert-heading">High {{status}}</h4>
+      <h4 class="alert-heading">High</h4>
       <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
       <hr>
       <p class="mb-0">Classification is made according to the information provided to the system.</p>
@@ -23,7 +23,7 @@
       <hr>
       <p class="mb-0">Classification is made according to the information provided to the system.</p>
     </div>
-    {%else%} 
+    {%elif prediction_text == 0 %} 
     <p>{{date}} &emsp; &emsp; &emsp; &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
       Harzard Level: Low </p>
     <hr style="color: green;">

@@ -4,29 +4,28 @@
 
 
 
-from enum import unique
 from flask import Flask,g,session,flash
 
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user,UserMixin,login_user,LoginManager,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
-from wtforms import EmailField,HiddenField,StringField,PasswordField,IntegerField,FloatField
+from wtforms import EmailField,StringField,PasswordField,FloatField
 from wtforms.validators import InputRequired,Email,Length,ValidationError,DataRequired,NumberRange
 from flask_bootstrap import Bootstrap
 from joblib import load
 import warnings
 import datetime
 import sqlite3
+import numpy as np
+from sklearn.preprocessing import RobustScaler
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app) 
 Bootstrap(app)
-conn = sqlite3.connect("database.db")
-cursor = conn.cursor()
 model = load('random_forest.joblib')
 
 
@@ -51,13 +50,13 @@ class features(db.Model):
     id = db.Column(db.Integer,primary_key=True,unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     date=db.Column(db.Date, default=datetime.datetime.utcnow)
-    month = db.Column(db.Integer,nullable=False)
+    #month = db.Column(db.Integer,nullable=False)
     temp = db.Column(db.Float[20],nullable=False)
     rh = db.Column(db.Float[20],nullable=False)
     wind = db.Column(db.Float[20],nullable=False)
     ffmc = db.Column(db.Float[20],nullable=False)
     dmc = db.Column(db.Float[20],nullable=False)
-    isi = db.Column(db.Float[20],nullable=False)
+    dc = db.Column(db.Float[20],nullable=False)
     status = db.Column(db.Integer, nullable=False)
 
 
@@ -80,14 +79,14 @@ class LoginForm(FlaskForm):
    
 
 class PredictionForm(FlaskForm):
-    user = HiddenField(validators=[DataRequired()])
-    month = IntegerField(validators=[NumberRange(min=1,max=12) ,InputRequired(),DataRequired()],render_kw={'placeholder':'Month in Number ie: 1 (January)'})
+   
+    #month = IntegerField(validators=[NumberRange(min=1,max=12) ,InputRequired(),DataRequired()],render_kw={'placeholder':'Month in Number ie: 1 (January)'})
     temp = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Temperature'})
     rh = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Relative Humidity'})
     wind = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Wind Speed'})
     ffmc = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'FFMC'})
     dmc = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'DMC'})
-    isi = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'ISI'})
+    dc = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'DC'})
     
 @app.route("/")
 def home():
@@ -117,18 +116,22 @@ def predict():
     x = datetime.datetime.now()
     y = x.strftime("%A %b %d, %Y, %I:%M:%S %p")
     form = PredictionForm()
-    data_features = [form.month.data,form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.isi.data]
-    final_features = [data_features]
-    prediction = model.predict(final_features)
+    robust_scaler = RobustScaler()
+    data_features = [form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.dc.data]
+    #data_features = data_features.reshape(1,-1)
+    #scaled_features = robust_scaler.fit_transform(reshape)
+    #data_features = robust_scaler.fit_transform(data_features)
+    #final_features = [scaled_features]
+    prediction = model.predict([data_features])
     if prediction == 1: 
         #store in db
-        new_entry = features(user_id=current_user.id,month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data,status=1)
+        new_entry = features(user_id=current_user.id,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,dc=form.dc.data,status=1)
         db.session.add(new_entry)
         db.session.commit()
         
         return render_template('dashboard.html',date=y,name=session.get("username","Unknown"),prediction_text=1)
-    else: 
-        new_entry = features(user_id=form.user.data,month=form.month.data,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,isi=form.isi.data,status=0)
+    elif prediction == 0: 
+        new_entry = features(user_id=current_user.id,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,dc=form.dc.data,status=0)
         db.session.add(new_entry)
         db.session.commit()
         
