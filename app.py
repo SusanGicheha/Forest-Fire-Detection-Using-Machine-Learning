@@ -26,6 +26,9 @@ app = Flask(__name__)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app) 
 Bootstrap(app)
+
+
+
 model = load('random_forest.joblib')
 
 
@@ -172,10 +175,14 @@ def dashboard():
     x = datetime.datetime.now()
     y = x.strftime("%A %b %d, %Y, %I:%M %p")
     #r_status = features.query.order_by(features.status.desc()).first()
-    r_status = features.query.value(features.status.desc())
+    #r_status = features.query.value(features.status.desc())
     #read_status = cursor.execute('SELECT * FROM features ORDER BY status DESC LIMIT 1;')
     #r_status = read_status.fetchone()
-    return render_template('dashboard.html', name=session.get("username","Unknown"), date=y,status=r_status)
+    con = sqlite3.connect('database.db') 
+    cur = con.cursor() 
+    row = cur.execute('SELECT status FROM features ORDER BY id DESC LIMIT 1;')
+    last_row = row.fetchone()
+    return render_template('dashboard.html', name=session.get("username","Unknown"), date=y,last_row=last_row)
 
 
 

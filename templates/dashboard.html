@@ -2,10 +2,35 @@
 
 {% block content %}
 
-    
+<!-- on log in    -->
+   
+{% if current_user.is_authenticated %}
+   
    <h3>Hello {{name}},</h3>
-   {% if current_user.is_authenticated %}
-   <!-- {{status}} -->
+  {% if last_row == (1,)%}
+  <h4 style="color: red;">{{date}} &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;  
+    Harzard Level: High </h4>
+   <hr style="color: green;">
+    <div class="alert alert-danger" role="alert">
+     <h4 class="alert-heading">High</h4>
+     <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+     <hr>
+     <p class="mb-0">Classification is made according to the information provided to the system.</p>
+   </div>
+  {%else%}
+  <p>{{date}} &emsp; &emsp; &emsp; &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    Harzard Level: Low </p>
+  <hr style="color: green;">
+  <div class="alert alert-success" role="alert">
+    <h4 class="alert-heading">Low</h4>
+    <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+    <hr>
+    <p class="mb-0">Classification is made according to the information provided to the system.</p>
+  </div>
+  {%endif%}
+
+  <!-- display on prediction -->
+
    {%if prediction_text == 1 %}
   <h4 style="color: red;">{{date}} &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;  
      Harzard Level: High </h4>
@@ -16,13 +41,7 @@
       <hr>
       <p class="mb-0">Classification is made according to the information provided to the system.</p>
     </div>
-    <div class="p-3 w-100 border border-success rounded">
-      <h4 class="alert-heading">Low</h4>
-      
-      <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
-      <hr>
-      <p class="mb-0">Classification is made according to the information provided to the system.</p>
-    </div>
+    
     {%elif prediction_text == 0 %} 
     <p>{{date}} &emsp; &emsp; &emsp; &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
       Harzard Level: Low </p>
@@ -33,12 +52,7 @@
       <hr>
       <p class="mb-0">Classification is made according to the information provided to the system.</p>
     </div>
-    <div class="alert alert-secondary" role="alert">
-      <h4 class="alert-heading">High</h4>
-      <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
-      <hr>
-      <p class="mb-0">Classification is made according to the information provided to the system.</p>
-    </div>
+    
     {%endif%}
     
 {% endif %}
