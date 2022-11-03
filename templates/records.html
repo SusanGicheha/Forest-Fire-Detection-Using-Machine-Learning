@@ -1,11 +1,13 @@
 {% extends 'template.html' %}
 
 {% block content %}
+<div class="h4 pb-2 mb-4 text-black border-bottom border-danger">
+   Status Records
+ </div>
 
-    
-   <h2>Historical Records</h2>
-   </br>
    {% if current_user.is_authenticated %}
+   <div class="p-4 d-flex justify-content-center mt-0">
+      <main class="p-3 w-75 border rounded " >
    <div class="table-responsive">
    <table class="table table-sm ">
     <thead class="table-light"> 
@@ -41,7 +43,8 @@
         {%endfor%}
     </table>
    </div>
-    
+      </main>
+   </div>
 {% endif %}
 
 {% endblock %}

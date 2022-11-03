@@ -6,30 +6,41 @@
    
 {% if current_user.is_authenticated %}
    
-   <h3>Hello {{name}},</h3>
+   <!-- <h3>Hello {{name}},</h3> -->
+   {% endif %}
   {% if last_row == (1,)%}
-  <h4 style="color: red;">{{date}} &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;  
-    Harzard Level: High </h4>
+  <h4 style="color: black;">{{date}}&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; <b style="color: red;">Harzard Level: High</b></h4>
+
    <hr style="color: green;">
-    <div class="alert alert-danger" role="alert">
-     <h4 class="alert-heading">High</h4>
-     <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+   <div class="p-4 h-50 border-0 bd-example">
+    <div class="alert alert-danger mx-auto w-75 h-75" style="background-color: red; color: black;" role="alert">
+     <!-- <h4 class="alert-heading">High</h4> -->
+     <p>According to the information currently available to this tool, the potential of a forest fire in the area is classified as <b>High</b>. </p>
+      <p> This means that , there is a greater than 50% chance of encountering weather that could support a significant forest fire, which is likely to result in both life and property loss.</p>
+     <p>Predictions of future climate identify a likely increase in the frequency of fire weather occurrence in this region, including an increase in temperature and strong winds.
+       The fire is likely to increase in duration, and burn for a greater number of days.</p>
      <hr>
      <p class="mb-0">Classification is made according to the information provided to the system.</p>
    </div>
+   </div>
   {%else%}
-  <p>{{date}} &emsp; &emsp; &emsp; &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-    Harzard Level: Low </p>
+  <h4 style="color: black;">{{date}}&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; <b style="color: greenyellow;">Harzard Level: Low</b></h4>
+
   <hr style="color: green;">
-  <div class="alert alert-success" role="alert">
-    <h4 class="alert-heading">Low</h4>
-    <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+  <div class="p-4 h-50 border-0 bd-example">
+   <div class="alert alert-success mx-auto w-75 h-75" style="color: black;" role="alert">
+    <!-- <h4 class="alert-heading">High</h4> -->
+    <p>According to the information currently available to this tool, the potential of a forest fire in the area is classified as <b>Low</b>. </p>
+     <p> This means that , there is a less than 50% chance of encountering weather that could support a significant forest fire, which is likely to result in both life and property loss.</p>
+    <p>Predictions of future climate identify an unlikely increase in the frequency of fire weather occurrence in this region, including an increase in temperature and strong winds.
+      The fire is unlikely to increase in duration, or burn for a greater number of days.</p>
     <hr>
     <p class="mb-0">Classification is made according to the information provided to the system.</p>
   </div>
+  </div>
   {%endif%}
 
-  <!-- display on prediction -->
+  <!-- display on prediction
 
    {%if prediction_text == 1 %}
   <h4 style="color: red;">{{date}} &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;  
@@ -37,9 +48,12 @@
     <hr style="color: green;">
      <div class="alert alert-danger" role="alert">
       <h4 class="alert-heading">High</h4>
-      <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
-      <hr>
-      <p class="mb-0">Classification is made according to the information provided to the system.</p>
+      <p>According to the information currently available to this tool, the potential of a forest fire in the area is classified as <b>High</b>. </p>
+      <p> This means that , there is a greater than 50% chance of encountering weather that could support a significant forest fire, which is likely to result in both life and property loss.</p>
+     <p>Predictions of future climate identify a likely increase in the frequency of fire weather occurrence in this region, including an increase in temperature and strong winds.
+       The fire is likely to increase in duration, and burn for a greater number of days.</p>
+     <hr>
+     <p class="mb-0">Classification is made according to the information provided to the system.</p>
     </div>
     
     {%elif prediction_text == 0 %} 
@@ -47,14 +61,16 @@
       Harzard Level: Low </p>
     <hr style="color: green;">
     <div class="alert alert-success" role="alert">
-      <h4 class="alert-heading">Low</h4>
-      <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
-      <hr>
-      <p class="mb-0">Classification is made according to the information provided to the system.</p>
+      <p>According to the information currently available to this tool, the potential of a forest fire in the area is classified as <b>Low</b>. </p>
+     <p> This means that , there is a less than 50% chance of encountering weather that could support a significant forest fire, which is likely to result in both life and property loss.</p>
+    <p>Predictions of future climate identify an ulikely increase in the frequency of fire weather occurrence in this region, including an increase in temperature and strong winds.
+      The fire is unlikely to increase in duration, or burn for a greater number of days.</p>
+    <hr>
+    <p class="mb-0">Classification is made according to the information provided to the system.</p>
     </div>
     
-    {%endif%}
+    {%endif%} -->
     
-{% endif %}
+
 
 {% endblock %}

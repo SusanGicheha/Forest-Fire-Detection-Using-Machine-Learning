@@ -1,0 +1,58 @@
+{% extends 'template.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<body style="background-image: url('/static/background_fire.jpg'); background-size: cover;">
+    <div class="row">
+        <div class="col ">
+            <div class="pt-5 mt-5 d-flex justify-content-left">
+ 
+  
+                <main class="p-3 mt-5 w-auto border rounded">
+                <h1 style="color: white;"><b>Fire Risk Monitoring Platform</b></h1>
+                <p style="color: white; ">Early Warning System for Fire Risk Reduction</p>
+                
+                <a href="{{ url_for('dashboard') }} " class="btn btn-light">View Today's Forecast</a>
+                </main>
+                
+              </div>
+        </div>
+
+
+        <!-- log in section -->
+        <div class="col col-lg-5">
+            <div class="p-5 ps-3 d-flex mt-5 justify-content-right">
+ 
+  
+                <main class="p-3 w-100 border rounded bg-secondary p-2" style="--bs-bg-opacity: .75;">
+                <div>
+                  {% for message in get_flashed_messages() %}
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                      <div>
+                      {{message}}
+                      
+                      </div>
+                    </div>
+                  {% endfor %}
+                <form class="justify-content-md-center" method="post" action="/login">
+                <h3 class="form-signin-heading">Login (Admin Use Only)</h3>
+                  {{form.hidden_tag()}}
+                  <div class="mb-3">
+                  {{wtf.form_field(form.username)}}
+                  </div>
+                  <div class="mb-3">
+                  
+                  {{wtf.form_field(form.password)}}
+                  </div>
+                <div class="d-grid gap-2 col-3 justify-content-md-right">
+                  <button class="btn btn-secondary" type="submit">Login</button>
+                </div>
+                </form>
+                </main>
+                
+              </div>
+        </div>
+      </div>
+    
+    </body>
+    
+{% endblock %}

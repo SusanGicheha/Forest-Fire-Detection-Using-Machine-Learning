@@ -9,11 +9,15 @@ Inputs
 {% endblock %}
 
 {% block content %}
-<div class="container ">
-  <main class="form-signin">
-  <form class="form-signin" method="post" action="/predict">
-    <h2 class="form-signin-heading">Fill in with the appropriate data</h2>
-    <br/>
+<body >
+  <div class="h4 pb-2 mb-4 text-black border-bottom border-danger">
+   Update predictions by filling the form below with appropriate data
+  </div>
+<div class=" d-flex justify-content-center mt-0">
+  <main class="p-3 w-50 border rounded " >
+  <form class="justify-content-md-center " method="post" action="/predict">
+    
+   
    
       {{form.hidden_tag()}}
       
@@ -32,4 +36,5 @@ Inputs
   </main>
   
 </div>
+</body>
 {% endblock %}

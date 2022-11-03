@@ -94,7 +94,7 @@ class PredictionForm(FlaskForm):
 @app.route("/")
 def home():
     #return render_template('home.html')
-    return redirect(url_for('login'))
+    return redirect(url_for('landing'))
 
 
 
@@ -110,11 +110,12 @@ def inputs():
     #     # predict = [np.array(new_entry)]
     #     # prediction = model.predict(predict)
     #     return redirect(url_for('dashboard'))
-    return render_template('inputs.html', form=form)
+    return render_template('inputs.html', form=form,name=session.get("username","Unknown"))
 
 
 
 @app.route("/predict",methods=['POST'])
+@login_required
 def predict():
     x = datetime.datetime.now()
     y = x.strftime("%A %b %d, %Y, %I:%M:%S %p")
@@ -141,6 +142,7 @@ def predict():
         return render_template('dashboard.html',date=y,name=session.get("username","Unknown"),prediction_text=0)
 
 @app.route("/records", methods=['GET','POST'])
+@login_required
 def records():
     read_records=features.query.order_by(features.id)
     return render_template('records.html',name=session.get("username","Unknown"),read_records=read_records)
@@ -165,12 +167,15 @@ def login():
         else:
             flash("Incorrect Username - Try Again")
         
-    return render_template('login.html',form=form)
+    return render_template('landing.html',form=form)
 
-
+@app.route("/landing", methods=['GET','POST'] )
+def landing():
+    form = LoginForm()
+    return render_template("landing.html", form=form)
 
 @app.route("/dashboard", methods=['GET','POST'])
-@login_required
+#@login_required
 def dashboard():
     x = datetime.datetime.now()
     y = x.strftime("%A %b %d, %Y, %I:%M %p")
@@ -187,7 +192,7 @@ def dashboard():
 
 
 @app.route("/register", methods=['GET','POST'])
-#@login_required
+@login_required
 def register():
     form =  RegisterForm()
     if form.validate_on_submit():
@@ -204,7 +209,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('landing'))
 
 
 if __name__ == '__main__':
