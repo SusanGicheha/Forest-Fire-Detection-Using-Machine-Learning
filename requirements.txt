@@ -28,7 +28,6 @@ pycparser==2.21
 pypiwin32==223
 pyrsistent==0.18.1
 python-dotenv==0.20.0
-pywin32==304
 PyYAML==5.4.1
 rcssmin==1.1.1
 scikit-learn==1.0.2
