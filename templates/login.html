@@ -10,11 +10,11 @@ Inputs
 
 
 {% block content %}
-
-<div class="p-5 d-flex justify-content-center">
+<body style="background-image: url('/static/background_fire.jpg'); background-size: cover;">
+<div class="p-5 d-flex justify-content-left">
  
   
-  <main class="p-3 w-75 border">
+  <main class="p-3 mt-5 w-50 text-white border rounded">
   <div>
     {% for message in get_flashed_messages() %}
       <div class="alert alert-danger d-flex align-items-center" role="alert">
@@ -41,4 +41,5 @@ Inputs
   </main>
   
 </div>
+</body>
 {% endblock %}

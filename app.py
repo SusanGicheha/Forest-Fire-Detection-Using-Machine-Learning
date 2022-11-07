@@ -167,7 +167,7 @@ def login():
         else:
             flash("Incorrect Username - Try Again")
         
-    return render_template('landing.html',form=form)
+    return render_template('login.html',form=form)
 
 @app.route("/landing", methods=['GET','POST'] )
 def landing():
