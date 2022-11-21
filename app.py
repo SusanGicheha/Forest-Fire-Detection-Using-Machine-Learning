@@ -132,15 +132,16 @@ def predict():
         new_entry = features(user_id=current_user.id,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,dc=form.dc.data,status=1)
         db.session.add(new_entry)
         db.session.commit()
-        
-        return render_template('dashboard.html',date=y,name=session.get("username","Unknown"),prediction_text=1)
+        flash("Status Updated Successfully!")
+        #return render_template('dashboard',date=y,name=session.get("username","Unknown"),prediction_text=1)
+        return redirect(url_for('inputs'))
     elif prediction == 0: 
         new_entry = features(user_id=current_user.id,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,dc=form.dc.data,status=0)
         db.session.add(new_entry)
         db.session.commit()
-        
-        return render_template('dashboard.html',date=y,name=session.get("username","Unknown"),prediction_text=0)
-
+        flash("Status Updated Successfully!")
+        #return render_template('dashboard',date=y,name=session.get("username","Unknown"),prediction_text=0)
+        return redirect(url_for('inputs'))
 @app.route("/records", methods=['GET','POST'])
 @login_required
 def records():
