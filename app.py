@@ -1,11 +1,4 @@
-#imports
-
-
-
-
-
 from flask import Flask,g,session,flash
-
 from flask import render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user,UserMixin,login_user,LoginManager,login_required,logout_user,current_user
@@ -18,7 +11,6 @@ from joblib import load
 import warnings
 import datetime
 import sqlite3
-import numpy as np
 from sklearn.preprocessing import RobustScaler
 warnings.filterwarnings('ignore')
 
@@ -53,7 +45,6 @@ class features(db.Model):
     id = db.Column(db.Integer,primary_key=True,unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     date=db.Column(db.Date, default=datetime.datetime.utcnow)
-    #month = db.Column(db.Integer,nullable=False)
     temp = db.Column(db.Float[20],nullable=False)
     rh = db.Column(db.Float[20],nullable=False)
     wind = db.Column(db.Float[20],nullable=False)
@@ -105,11 +96,7 @@ def inputs():
     form = PredictionForm()
     if form.validate_on_submit():
         return redirect(url_for('dashboard'))
-    # if form.validate_on_submit():
-    #     # new_entry = [form.month.data,form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.isi.data]
-    #     # predict = [np.array(new_entry)]
-    #     # prediction = model.predict(predict)
-    #     return redirect(url_for('dashboard'))
+ 
     return render_template('inputs.html', form=form,name=session.get("username","Unknown"))
 
 
@@ -120,12 +107,7 @@ def predict():
     x = datetime.datetime.now()
     y = x.strftime("%A %b %d, %Y, %I:%M:%S %p")
     form = PredictionForm()
-    robust_scaler = RobustScaler()
     data_features = [form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.dc.data]
-    #data_features = data_features.reshape(1,-1)
-    #scaled_features = robust_scaler.fit_transform(reshape)
-    #data_features = robust_scaler.fit_transform(data_features)
-    #final_features = [scaled_features]
     prediction = model.predict([data_features])
     if prediction == 1: 
         #store in db
