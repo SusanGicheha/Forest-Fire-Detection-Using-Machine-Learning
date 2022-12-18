@@ -1,1 +1,1 @@
-# Forest-Fire-Detection-Using-Machine-Learning
+# Forest-Fire-Prediction-Using-Random-Forest-Classifier
