@@ -1,17 +1,16 @@
-from flask import Flask,g,session,flash
+from flask import Flask,session,flash
 from flask import render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user,UserMixin,login_user,LoginManager,login_required,logout_user,current_user
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
 from wtforms import EmailField,StringField,PasswordField,FloatField
-from wtforms.validators import InputRequired,Email,Length,ValidationError,DataRequired,NumberRange
+from wtforms.validators import InputRequired,Length,ValidationError,DataRequired
 from flask_bootstrap import Bootstrap
 from joblib import load
 import warnings
 import datetime
 import sqlite3
-from sklearn.preprocessing import RobustScaler
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -74,7 +73,7 @@ class LoginForm(FlaskForm):
 
 class PredictionForm(FlaskForm):
    
-    #month = IntegerField(validators=[NumberRange(min=1,max=12) ,InputRequired(),DataRequired()],render_kw={'placeholder':'Month in Number ie: 1 (January)'})
+    
     temp = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Temperature'})
     rh = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Relative Humidity'})
     wind = FloatField(validators=[InputRequired(),DataRequired()],render_kw={'placeholder':'Wind Speed'})
@@ -84,7 +83,7 @@ class PredictionForm(FlaskForm):
     
 @app.route("/")
 def home():
-    #return render_template('home.html')
+
     return redirect(url_for('landing'))
 
 
@@ -92,7 +91,7 @@ def home():
 @app.route("/inputs", methods=['GET','POST'])
 @login_required
 def inputs():
-    #inputs=None
+    
     form = PredictionForm()
     if form.validate_on_submit():
         return redirect(url_for('dashboard'))
@@ -105,7 +104,7 @@ def inputs():
 @login_required
 def predict():
     x = datetime.datetime.now()
-    y = x.strftime("%A %b %d, %Y, %I:%M:%S %p")
+    y = x.strftime("%m/%d/%Y")
     form = PredictionForm()
     data_features = [form.temp.data,form.rh.data,form.wind.data,form.ffmc.data,form.dmc.data,form.dc.data]
     prediction = model.predict([data_features])
@@ -115,14 +114,12 @@ def predict():
         db.session.add(new_entry)
         db.session.commit()
         flash("Status Updated Successfully!")
-        #return render_template('dashboard',date=y,name=session.get("username","Unknown"),prediction_text=1)
         return redirect(url_for('inputs'))
     elif prediction == 0: 
         new_entry = features(user_id=current_user.id,temp=form.temp.data,rh=form.rh.data,wind = form.wind.data,ffmc=form.ffmc.data,dmc=form.dmc.data,dc=form.dc.data,status=0)
         db.session.add(new_entry)
         db.session.commit()
         flash("Status Updated Successfully!")
-        #return render_template('dashboard',date=y,name=session.get("username","Unknown"),prediction_text=0)
         return redirect(url_for('inputs'))
 @app.route("/records", methods=['GET','POST'])
 @login_required
@@ -158,14 +155,9 @@ def landing():
     return render_template("landing.html", form=form)
 
 @app.route("/dashboard", methods=['GET','POST'])
-#@login_required
 def dashboard():
     x = datetime.datetime.now()
-    y = x.strftime("%A %b %d, %Y, %I:%M %p")
-    #r_status = features.query.order_by(features.status.desc()).first()
-    #r_status = features.query.value(features.status.desc())
-    #read_status = cursor.execute('SELECT * FROM features ORDER BY status DESC LIMIT 1;')
-    #r_status = read_status.fetchone()
+    y = x.strftime("%A %b %d, %Y")
     con = sqlite3.connect('database.db') 
     cur = con.cursor() 
     row = cur.execute('SELECT status FROM features ORDER BY id DESC LIMIT 1;')
